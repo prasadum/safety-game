@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SafetyLearn — Fire Extinguisher Battle</title>
+<title>SafetyLearn — Fire Safety Exam</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <style>
@@ -31,15 +31,14 @@ header {
 .screen.active { display: block; }
 
 h1 { font-size: 3.8rem; margin-bottom: 20px; text-align: center; font-weight: 900; }
-h2 { font-size: 2.5rem; margin-bottom: 20px; }
-p { font-size: 1.5rem; }
+h2 { font-size: 2.5rem; margin-bottom: 20px; text-align: center; }
 
 .lcard { 
   background: var(--panel); border: 4px solid var(--border); border-radius: 20px; 
-  padding: 40px; cursor: pointer; text-align: center; transition: 0.2s;
+  padding: 40px; text-align: center; transition: 0.2s;
 }
-.lcard:hover { border-color: var(--accent); background: #e2e8f0; }
-.lcard h3 { font-size: 2.5rem; margin-bottom: 10px; }
+.lcard-btn { cursor: pointer; }
+.lcard-btn:hover { border-color: var(--accent); background: #e2e8f0; }
 
 input { 
   width: 100%; font-size: 2rem; padding: 20px; border: 4px solid var(--border); 
@@ -57,9 +56,8 @@ input {
   border: 5px solid #000; margin-bottom: 30px; text-align: center;
 }
 #qTitle { font-size: 3rem; font-weight: 900; margin: 20px 0; }
-.comp-display { display: flex; justify-content: center; align-items: center; min-height: 120px; }
 
-.ans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.ans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
 .ans-btn { 
   background: #fff; border: 5px solid var(--border); font-size: 2.2rem; 
   padding: 25px; border-radius: 20px; font-family: 'Share Tech Mono'; font-weight: 900;
@@ -74,61 +72,49 @@ input {
   border-bottom: 1px solid #333; font-family: 'Share Tech Mono';
 }
 .lb-rank { width: 80px; color: var(--gold); }
-.lb-change { width: 100px; font-size: 1.5rem; }
-.lb-name { flex: 1; }
+.lb-name { flex: 1; text-align: left; }
 .lb-pts { font-weight: 900; color: #00d4ff; }
-
-.up { color: #00ff00; }
-.down { color: #ff3300; }
 
 .instructor-bar { 
   position: fixed; bottom: 0; left: 0; right: 0; padding: 20px; 
   background: #fff; border-top: 5px solid #000; display: none; justify-content: center; z-index: 500;
 }
 
-/* Extinguisher Graphic Badges */
-.ext-badge {
-  padding: 20px 40px; border-radius: 15px; color: white; font-weight: 900; 
-  font-size: 2.5rem; border: 4px solid #000; display: inline-block;
-}
-.type-water { background: #d90429; }
-.type-foam { background: #f4a261; color: #000; }
-.type-co2 { background: #2b2d42; }
-.type-powder { background: #0077b6; }
+/* FINAL MARKS TABLE */
+.final-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-family: 'Share Tech Mono'; }
+.final-table th, .final-table td { padding: 20px; border: 3px solid #000; font-size: 2rem; text-align: center; }
+.final-table th { background: #111; color: #fff; }
+.final-table tr:nth-child(even) { background: #e2e8f0; }
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo">SAFETY<span>LEARN</span></div>
-  <div id="roomInfo" style="font-size: 1.5rem; font-family: 'Share Tech Mono'">CLASSROOM MODE</div>
+  <div id="roomInfo" style="font-size: 1.5rem; font-family: 'Share Tech Mono'">GENERAL SAFETY & EXTINGUISHERS</div>
 </header>
 
 <!-- LOBBY -->
 <div class="screen active" id="lobby">
   <h1>FIRE SAFETY EXAM</h1>
   <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px">
-    <div class="lcard" onclick="goSolo()"><h3>🎮 SOLO</h3><p>Practice Mode</p></div>
-    <div class="lcard" onclick="showScreen('setup')"><h3>📡 CLASSROOM</h3><p>Host WiFi Session</p></div>
+    <div class="lcard lcard-btn" onclick="goSolo()"><h3>🎮 SOLO</h3><p>Practice Mode</p></div>
+    <div class="lcard lcard-btn" onclick="showScreen('setup')"><h3>📡 CLASSROOM</h3><p>Host WiFi Exam</p></div>
   </div>
   <div class="lcard">
     <h2>TRAINEE JOIN</h2>
     <input id="joinName" placeholder="ENTER YOUR NAME">
     <input id="joinCode" placeholder="ROOM CODE" maxlength="6">
-    <button class="btn btn-primary" onclick="joinRoom()">JOIN SESSION →</button>
+    <button class="btn btn-primary" onclick="joinRoom()">JOIN EXAM SESSION →</button>
   </div>
 </div>
 
 <!-- SETUP -->
 <div class="screen" id="setup">
-  <h1>SESSION CONFIGURATION</h1>
+  <h1>EXAM SETUP</h1>
   <div class="lcard">
-    <h2>Select Safety Drill Format:</h2>
-    <div style="display:flex; gap:20px; margin: 30px 0">
-      <button class="btn" style="background:#e2e8f0; color:#000" onclick="gType='pass'">PASS METHOD</button>
-      <button class="btn" style="background:#e2e8f0; color:#000" onclick="gType='class'">CLASSES OF FIRE</button>
-      <button class="btn" style="background:#e2e8f0; color:#000" onclick="gType='mixed'">MIXED DRILL</button>
-    </div>
+    <h2>Host Official Fire Safety Drill (10 Unique Questions)</h2>
+    <p style="margin: 20px 0; color: #555;">Questions strictly derived from ITI General Safety & Fire Fighting Standards.</p>
     <button class="btn btn-primary" onclick="createRoom()">CREATE EXAM ROOM</button>
   </div>
 </div>
@@ -143,46 +129,76 @@ input {
       <div id="pList" style="font-size: 1.8rem; font-family: 'Share Tech Mono'"></div>
     </div>
   </div>
-  <button class="btn btn-primary" id="startBtn" style="display:none" onclick="hostStart()">▶ BEGIN CLASS DRILL</button>
+  <button class="btn btn-primary" id="startBtn" style="display:none" onclick="hostStart()">▶ BEGIN EXAM FOR ALL</button>
 </div>
 
 <!-- GAME -->
 <div class="screen" id="game">
   <div class="q-card">
     <div id="qLabel" style="font-size: 1.8rem; color: var(--accent); text-align: left; font-weight: 900">QUESTION 1/10</div>
-    <div id="compDisp" class="comp-display"></div>
     <div id="qTitle">Identify Action</div>
     <div class="ans-grid" id="ansGrid"></div>
   </div>
   <div class="lb-panel">
-    <h2>LIVE RANKINGS</h2>
+    <h2 style="color: #fff">LIVE RANKINGS</h2>
     <div id="lbRows"></div>
+  </div>
+</div>
+
+<!-- FINAL RESULTS SCREEN -->
+<div class="screen" id="final">
+  <h1>🏆 FINAL RESULTS (MARKS ORDER)</h1>
+  <div class="lcard">
+    <table class="final-table">
+      <thead>
+        <tr>
+          <th>RANK</th>
+          <th>TRAINEE NAME</th>
+          <th>MARKS OBTAINED</th>
+        </tr>
+      </thead>
+      <tbody id="finalTableBody"></tbody>
+    </table>
+    <button class="btn btn-primary" style="margin-top: 30px;" onclick="location.reload()">RETURN TO LOBBY</button>
   </div>
 </div>
 
 <!-- FOOTER CONTROL -->
 <div class="instructor-bar" id="instrBar">
-  <button class="btn btn-primary" style="width: auto" onclick="nextQ()">NEXT QUESTION →</button>
+  <button class="btn btn-primary" style="width: auto" id="nextBtn" onclick="nextQ()">NEXT QUESTION →</button>
 </div>
 
 <script>
-const QUESTIONS_PASS = [
-  { q: "What does 'P' stand for in the P.A.S.S. method?", a: "Pull the Pin", w: ["Press the Handle", "Point the Nozzle", "Push the Lever"] },
-  { q: "What does the first 'A' stand for in P.A.S.S.?", a: "Aim Low at Base", w: ["Aim at Flames", "Activate Alarm", "Ask for Help"] },
-  { q: "What does the first 'S' stand for in P.A.S.S.?", a: "Squeeze the Handle", w: ["Sweep Side to Side", "Stop and Roll", "Search for Fuel"] },
-  { q: "What does the second 'S' stand for in P.A.S.S.?", a: "Sweep Side to Side", w: ["Squeeze the Handle", "Stay Low", "Shout Danger"] }
+// 20 Questions Generated Directly From PDF Content
+const ALL_QUESTIONS = [
+  { q: "Which method of extinguishing fire involves removing the fuel from the fire?", a: "Starving", w: ["Smothering", "Cooling", "BlankETING"] },
+  { q: "Smothering is the method of extinguishing fire by removing which element?", a: "Oxygen", w: ["Fuel", "Heat", "Ignition Spark"] },
+  { q: "What method lowers the temperature of a fire below its ignition point using water?", a: "Cooling", w: ["Starving", "Smothering", "Isolation"] },
+  { q: "Fires involving solid combustibles like wood, paper, and cloth belong to which class?", a: "Class A", w: ["Class B", "Class C", "Class D"] },
+  { q: "Flammable liquids like oil, grease, gasoline, and paint are classified as which fire type?", a: "Class B", w: ["Class A", "Class C", "Class D"] },
+  { q: "LPG, Acetylene, and Natural Gas fires belong to which fire classification?", a: "Class C", w: ["Class A", "Class B", "Class D"] },
+  { q: "Fire in electrical equipment or metals is classified under which fire class?", a: "Class D", w: ["Class A", "Class B", "Class C"] },
+  { q: "What should NEVER be thrown on a live electrical fire?", a: "Water", w: ["Dry Sand", "CO2 Gas", "Carbon Tetrachloride (CTC)"] },
+  { q: "Which color code identifies a Foam fire extinguisher?", a: "Cream", w: ["Red", "Blue", "Black"] },
+  { q: "A Black color code band on an extinguisher indicates which agent?", a: "Carbon Dioxide (CO2)", w: ["Water-filled", "Dry Powder", "Foam"] },
+  { q: "A Blue color code band indicates which type of fire extinguisher?", a: "Dry Powder", w: ["Foam", "Water-filled", "CO2"] },
+  { q: "What extinguisher type is SAFEST for flammable liquid (Class B) and running liquid fires?", a: "Foam", w: ["Water Jet", "Pure Water", "Wet Chemical Only"] },
+  { q: "In the P.A.S.S. technique, what does the letter 'P' stand for?", a: "Pull the Pin", w: ["Press the Handle", "Point the Horn", "Push the Lever"] },
+  { q: "In the P.A.S.S. technique, where should you AIM the nozzle ('A')?", a: "At the Base of the fire", w: ["At the Flames", "At the Smoke", "At the Top"] },
+  { q: "In the P.A.S.S. technique, what does the first 'S' stand for?", a: "Squeeze the Handle", w: ["Sweep Side to Side", "Search for Fuel", "Stop and Roll"] },
+  { q: "In the P.A.S.S. technique, what does the second 'S' stand for?", a: "Sweep Side to Side", w: ["Squeeze the Lever", "Stay Low", "Shout Alarm"] },
+  { q: "When preparing electrolyte, what is the correct safety rule?", a: "Always add Acid to Water", w: ["Always add Water to Acid", "Mix both simultaneously", "Warm the water first"] },
+  { q: "What three elements make up the Fire Triangle?", a: "Fuel, Heat, Oxygen", w: ["Fuel, Water, Spark", "Heat, Air, Nitrogen", "Flame, Gas, Wind"] },
+  { q: "What is the simplest firefighting equipment filled with sand, water, or Flamezorb?", a: "Fire Bucket", w: ["Fire Hose Reel", "Dry Riser", "Fire Blanket"] },
+  { q: "Which extinguisher leaves NO residue and avoids contamination on electrical equipment?", a: "Carbon Dioxide (CO2)", w: ["Dry Powder", "Foam", "Water Additive"] }
 ];
 
-const QUESTIONS_CLASS = [
-  { q: "Which extinguisher is used for Class A (Wood, Paper, Trash)?", a: "Water / Foam", w: ["Carbon Dioxide (CO2)", "Wet Chemical Only", "Class D Powder"], type: "type-water", code: "WATER / FOAM" },
-  { q: "Which extinguisher is BEST for Class B (Flammable Liquids)?", a: "Dry Powder / CO2", w: ["Water Jet", "Wet Chemical", "Pure Oxygen"], type: "type-co2", code: "CO2 / POWDER" },
-  { q: "Which extinguisher should NEVER be used on electrical fires?", a: "Water Jet", w: ["CO2 Gas", "Dry Powder", "Clean Agent"], type: "type-water", code: "WATER JET" },
-  { q: "Class C fires involve which type of hazard?", a: "Flammable Gases", w: ["Cooking Oils", "Combustible Metals", "Paper/Textiles"], type: "type-powder", code: "CLASS C GAS" }
-];
+let peer=null, isHost=false, players={}, questions=[], current=0, answered=false;
 
-let peer=null, isHost=false, players={}, questions=[], current=0, answered=false, gType='pass', lastRanks={};
-
-function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function showScreen(id){ 
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); 
+  document.getElementById(id).classList.add('active'); 
+}
 
 function createRoom(){
   isHost=true; showScreen('waiting');
@@ -202,8 +218,9 @@ function createRoom(){
 }
 
 function joinRoom(){
-  const code = document.getElementById('joinCode').value || location.hash.replace('#','');
-  const name = document.getElementById('joinName').value || 'Trainee';
+  const code = document.getElementById('joinCode').value.trim().toUpperCase() || location.hash.replace('#','');
+  const name = document.getElementById('joinName').value.trim() || 'Trainee';
+  if(!code) return alert("Enter Code");
   isHost=false; showScreen('waiting');
   peer = new Peer({ debug: 1, secure: true });
   peer.on('open', ()=>{
@@ -213,46 +230,46 @@ function joinRoom(){
       if(d.type==='sync'){ players=d.players; renderLB(); }
       if(d.type==='start'){ questions=d.qs; current=0; showScreen('game'); renderNextQ(); }
       if(d.type==='next'){ current=d.cur; renderNextQ(); }
+      if(d.type==='over'){ showFinalResults(); }
     });
   });
 }
 
 function hostStart(){
-  let bank = gType==='pass' ? QUESTIONS_PASS : QUESTIONS_CLASS;
-  questions = [];
-  for(let i=0; i<10; i++) questions.push(bank[Math.floor(Math.random()*bank.length)]);
+  // NO REPETITION ALGORITHM: Shuffle array completely and extract first 10 items
+  let shuffled = [...ALL_QUESTIONS].sort(() => Math.random() - 0.5);
+  questions = shuffled.slice(0, 10);
+  
   broadcast({type:'start', qs: questions});
   document.getElementById('instrBar').style.display='flex';
-  showScreen('game'); renderNextQ();
+  showScreen('game'); 
+  renderNextQ();
 }
 
 function renderNextQ(){
-  answered=false; const q=questions[current];
-  document.getElementById('qLabel').innerText = `DRILL QUESTION ${current+1}/10`;
+  answered=false; 
+  const q = questions[current];
+  document.getElementById('qLabel').innerText = `EXAM QUESTION ${current + 1}/10`;
   document.getElementById('qTitle').innerText = q.q;
   
-  const cd=document.getElementById('compDisp'), aa=document.getElementById('ansGrid');
-  aa.innerHTML='';
+  const aa = document.getElementById('ansGrid');
+  aa.innerHTML = '';
   
-  if(q.type) {
-    cd.innerHTML = `<div class="ext-badge ${q.type}">${q.code}</div>`;
-  } else {
-    cd.innerHTML = `<div class="ext-badge type-co2">SAFETY DRILL</div>`;
-  }
-
-  let opts = [q.a, ...q.w].sort(()=>Math.random()-.5);
-  opts.forEach(o=>{
-    const b=document.createElement('button'); b.className='ans-btn'; b.innerText=o;
-    b.onclick=()=>{ 
+  let opts = [q.a, ...q.w].sort(() => Math.random() - 0.5);
+  opts.forEach(o => {
+    const b = document.createElement('button'); 
+    b.className = 'ans-btn'; 
+    b.innerText = o;
+    b.onclick = () => { 
       if(!answered && !isHost){ 
-        answered=true; 
-        if(o===q.a){
+        answered = true; 
+        if(o === q.a){
           b.classList.add('correct'); 
           peer.connections[Object.keys(peer.connections)[0]][0].send({type:'ans', pts:10, id:peer.id});
         } else {
           b.classList.add('wrong'); 
         }
-        document.querySelectorAll('.ans-btn').forEach(btn=>btn.disabled=true); 
+        document.querySelectorAll('.ans-btn').forEach(btn => btn.disabled = true); 
       }
     };
     aa.appendChild(b);
@@ -261,33 +278,64 @@ function renderNextQ(){
 
 function nextQ(){
   current++;
-  if(current < 10){ broadcast({type:'next', cur:current}); renderNextQ(); }
-  else alert("Exam Completed!");
+  if(current < 10){ 
+    broadcast({type:'next', cur:current}); 
+    renderNextQ(); 
+  } else {
+    // QUIZ ENDED: Broadcast over signal, hide Next button completely, show results
+    broadcast({type:'over'}); 
+    document.getElementById('instrBar').style.display = 'none'; 
+    showFinalResults(); 
+  }
 }
 
 function renderLB(){
-  const sorted = Object.values(players).sort((a,b)=>b.score-a.score);
-  document.getElementById('lbRows').innerHTML = sorted.map((p,i)=>{
-    const rank = i+1;
-    let change = '';
-    if(lastRanks[p.peerId]){
-      const diff = lastRanks[p.peerId] - rank;
-      if(diff > 0) change = `<span class="up">▲${diff}</span>`;
-      else if(diff < 0) change = `<span class="down">▼${Math.abs(diff)}</span>`;
-    }
-    lastRanks[p.peerId] = rank;
-    return `<div class="lb-row"><span class="lb-rank">#${rank}</span><span class="lb-change">${change}</span><span class="lb-name">${p.name.toUpperCase()}</span><span class="lb-pts">${p.score} PTS</span></div>`;
-  }).join('');
+  const sorted = Object.values(players).sort((a,b) => b.score - a.score);
+  document.getElementById('lbRows').innerHTML = sorted.map((p,i) => `
+    <div class="lb-row">
+      <span class="lb-rank">#${i+1}</span>
+      <span class="lb-name">${p.name.toUpperCase()}</span>
+      <span class="lb-pts">${p.score} MARKS</span>
+    </div>
+  `).join('');
+}
+
+function showFinalResults(){
+  document.getElementById('instrBar').style.display = 'none';
+  showScreen('final');
+  
+  // MARKS ORDER SORTING
+  const sorted = Object.values(players).sort((a,b) => b.score - a.score);
+  const tbody = document.getElementById('finalTableBody');
+  
+  tbody.innerHTML = sorted.map((p, i) => `
+    <tr>
+      <td><strong>#${i + 1}</strong></td>
+      <td>${p.name.toUpperCase()}</td>
+      <td><strong>${p.score} / 100</strong></td>
+    </tr>
+  `).join('');
 }
 
 function updatePList(){ 
   document.getElementById('pCount').innerText = `Trainees Joined: ${Object.keys(players).length}`; 
-  document.getElementById('pList').innerText = Object.values(players).map(p=>p.name).join(', ');
+  document.getElementById('pList').innerText = Object.values(players).map(p => p.name).join(', ');
 }
-function broadcast(m){ Object.values(peer.connections).forEach(conns=>conns[0].send(m)); }
-function goSolo(){ startSolo(); }
-function startSolo(){ hostStart(); }
-window.onload = () => { if(window.location.hash) document.getElementById('joinCode').value = window.location.hash.replace('#',''); };
+
+function broadcast(m){ 
+  Object.values(peer.connections).forEach(conns => conns[0].send(m)); 
+}
+
+function goSolo(){ 
+  questions = [...ALL_QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10);
+  current = 0; 
+  showScreen('game'); 
+  renderNextQ(); 
+}
+
+window.onload = () => { 
+  if(window.location.hash) document.getElementById('joinCode').value = window.location.hash.replace('#',''); 
+};
 </script>
 </body>
 </html>
